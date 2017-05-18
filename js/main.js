@@ -14,6 +14,7 @@ function saveBookmark(e)
         return false;
     }
 
+    //create bookmark object
     var bookmark =
         {
             name: siteName,
