@@ -25,15 +25,18 @@ function saveBookmark(e)
     //get bookmarks from local storage and if there are none create one
     if (localStorage.getItem("bookmarks") === null)
     {
-        var bookmarks = [];
-        bookmarks.push(bookmark);
-        localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+        var bookmarkObjects = {
+            bookmarks:[]
+        };
+        bookmarkObjects.bookmarks.push(bookmark);
+        //bookmarks.push(bookmark);
+        localStorage.setItem("bookmarks", JSON.stringify(bookmarkObjects));
     }
     else
     {
-        var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
-        bookmarks.push(bookmark);
-        localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+        var bookmarkObjects = JSON.parse(localStorage.getItem("bookmarks"));
+        bookmarkObjects.bookmarks.push(bookmark);
+        localStorage.setItem("bookmarks", JSON.stringify(bookmarkObjects));
     }
 
     //Clear form
@@ -45,45 +48,38 @@ function saveBookmark(e)
 }
 
 function fetchBookmarks()
-{
+{   
     //get bookmarks from local storage
-    var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
+    var bookmarkObjects = JSON.parse(localStorage.getItem("bookmarks"));
 
     //get output id
     var bookmarksResults = document.getElementById("bookmarksResults");
-    bookmarksResults.innerHTML = '';
 
-    for(var i=0;i<bookmarks.length;i++)
-    {
-        var name = bookmarks[i].name;
-        var url = bookmarks[i].url;
-        bookmarksResults.innerHTML += "<div class=well>" +
-        "<h3>" + name  +
-        "<a class=' btn btn-default' target='_blank' href='" + url + "'>Visit</a>" +
-        "<a class=' btn btn-danger' onclick='deleteBookmark(\"" + url + "\")' href='#'>Delete</a>" +
-         "</h3>"+
-        "</div>";
-    }
+    //generate HTML using Handlebars.js
+    var rawTemplate = document.getElementById("myTemplate").innerHTML;
+    var compiledTemplate = Handlebars.compile(rawTemplate);
+    var generatedHTML = compiledTemplate(bookmarkObjects);
+    bookmarksResults.innerHTML = generatedHTML;
 
-    
+  
    
 }
 
 function deleteBookmark(url)
 {
     //get bookmarks from local storage
-    var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
+    var bookmarkObjects = JSON.parse(localStorage.getItem("bookmarks"));
     //loop through bookmarks
-    for(var i=0;i<bookmarks.length;i++)
+    for (var i = 0; i < bookmarkObjects.bookmarks.length; i++)
     {
-        if(bookmarks[i].url===url)
+        if (bookmarkObjects.bookmarks[i].url === url)
         {
-            bookmarks.splice(i, 1);
+            bookmarkObjects.bookmarks.splice(i, 1);
         }
     }
 
     //reset local storage
-    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarkObjects));
 
     fetchBookmarks();
    
